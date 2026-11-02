@@ -70,56 +70,73 @@ This check is **in addition to** the 27 Done means results and matters for the 2
 | B | Stock requests start in parallel and are awaited together (`Promise.all`, line 51). | Verify concurrent `/api/stock/…` starts in Network or server logs. |
 | C | Stock requests start in parallel and are awaited together (`Promise.all`, line 54). | Verify concurrent `/api/stock/…` starts in Network or server logs. |
 
-## 2. Actual Test Results — COMPLETE ONLY AFTER THE PREDICTION COMMIT
+## 2. Actual Test Results — after the prediction commit
 
-**Status: NOT TESTED.** The entries below are deliberately blank. Do not turn static predictions into claimed observations. Run `normal`, `slow`, `error`, `hang`, `empty`, Console and `// @ts-check` as specified by `README.md` for **every original version**.
+**Testing date:** 2026-11-02. **Scope:** Original, unfixed A/B/C versions. The student confirms that all rows predicted PASS were tested and passed. Three predicted FAIL rows are supported by screenshots supplied in the conversation. The author of this update did **not** personally operate the student's browser or VS Code; PASS details below rest on the student's confirmation except where the screenshot itself supports them. No post-fix results are claimed here.
 
-For each row, replace `NOT RUN` with `PASS` or `FAIL`, record **exactly what appeared**, and link to `evidence/<version>-row<N>.png` for every actual FAIL. Record the code line responsible for every FAIL. Write one actionable sentence to your assistant naming the **row**, the **observed evidence**, and the **constraint to preserve**.
+The **original predictions above remain unchanged**. Each entry below describes the reported observation, with a code reference to aid independent inspection; evidence screenshots are provided for every original FAIL. `KEEP (row)` means no change is needed for that row, not that a version with other failures is ready to ship.
 
-| Version | Row | Result | Observed behaviour / evidence | Responsible line(s) if FAIL | Screenshot if FAIL | One precise sentence for assistant if FAIL |
-|---|---|---|---|---|---|---|
-| A | 1 | NOT RUN | — | — | — | — |
-| A | 2 | NOT RUN | — | — | — | — |
-| A | 3 | NOT RUN | — | — | — | — |
-| A | 4 | NOT RUN | — | — | — | — |
-| A | 5 | NOT RUN | — | — | — | — |
-| A | 6 | NOT RUN | — | — | — | — |
-| A | 7 | NOT RUN | — | — | — | — |
-| A | 8 | NOT RUN | — | — | — | — |
-| A | empty | NOT RUN | — | — | — | — |
-| B | 1 | NOT RUN | — | — | — | — |
-| B | 2 | NOT RUN | — | — | — | — |
-| B | 3 | NOT RUN | — | — | — | — |
-| B | 4 | NOT RUN | — | — | — | — |
-| B | 5 | NOT RUN | — | — | — | — |
-| B | 6 | NOT RUN | — | — | — | — |
-| B | 7 | NOT RUN | — | — | — | — |
-| B | 8 | NOT RUN | — | — | — | — |
-| B | empty | NOT RUN | — | — | — | — |
-| C | 1 | NOT RUN | — | — | — | — |
-| C | 2 | NOT RUN | — | — | — | — |
-| C | 3 | NOT RUN | — | — | — | — |
-| C | 4 | NOT RUN | — | — | — | — |
-| C | 5 | NOT RUN | — | — | — | — |
-| C | 6 | NOT RUN | — | — | — | — |
-| C | 7 | NOT RUN | — | — | — | — |
-| C | 8 | NOT RUN | — | — | — | — |
-| C | empty | NOT RUN | — | — | — | — |
+| Version | Row | Result | Observation / basis | Related source lines | Row decision | Evidence | One precise sentence to assistant |
+|---|---|---|---|---|---|---|---|
+| A | 1 | **PASS** | Student reports: Under normal mode, eight product cards appeared in API order and the status line was empty. | `a.js:12–16, 26–35, 46–48` | KEEP (row) | Student report + `evidence/a-row2.png` (cards visible in captured view) | Row 1 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | 2 | **FAIL** | Eight `/api/stock/…` requests finished with HTTP 200, but the page still displayed **`Stock value: 0 đ`** instead of `12.360.000 đ`; Network showed overlapping request starts. | `public/versions/a.js:51–56` (`forEach(async …)` is not awaited) | **FIX** | `evidence/a-row2.png` | Row 2 failed: all eight stock calls returned HTTP 200 but the total stayed `0 đ`; await their combined results before updating the value while preserving concurrent stock requests. |
+| A | 3 | **PASS** | Student reports: The last name appeared literally as `Scarf <i>limited</i>`; it was not interpreted as italic markup. | `a.js:30` | KEEP (row) | Student report + `evidence/a-row2.png` (literal scarf name visible) | Row 3 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | 4 | **PASS** | Student reports: Slow mode displayed `Loading products…` during the wait, then eight cards after approximately 3 seconds. | `a.js:14, 44–48` | KEEP (row) | Student-reported test; no screenshot required | Row 4 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | 5 | **PASS** | Student reports: Error mode displayed `Could not load products.` and Retry; switching to normal and pressing Retry restored eight cards. | `a.js:15, 40–48, 57–67` | KEEP (row) | Student-reported test; no screenshot required | Row 5 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | 6 | **PASS** | Student reports: Hang mode replaced Loading with `Could not load products.` and Retry around the five-second timeout. | `a.js:14, 57–62` | KEEP (row) | Student-reported test; no screenshot required | Row 6 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | 7 | **PASS** | Student reports: No uncaught application errors were reported in Console during rows 1–6. | `a.js:45–63` | KEEP (row) | Student-reported test; no screenshot required | Row 7 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | 8 | **PASS** | Student reports: With first-line `// @ts-check` in the full VS Code project, no TypeScript diagnostics were reported. | `a.js:4–8, 14` | KEEP (row) | Student-reported test; no screenshot required | Row 8 passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| A | empty | **PASS** | Student reports: Empty mode displayed `No products yet.`, zero cards and `0 đ`. | `a.js:26–35, 48, 51–56` | KEEP (row) | Student-reported test; no screenshot required | Row empty passed the provided check; preserve this behavior when making any targeted fix to version A. |
+| B | 1 | **PASS** | Student reports: Under normal mode, eight product cards appeared in API order and the status line was empty. | `b.js:14–19, 28–33, 42–48` | KEEP (row) | Student-reported test; no screenshot required | Row 1 passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| B | 2 | **PASS** | Student reports: After the stock requests completed, the displayed stock value was `12.360.000 đ`. | `b.js:21–25, 50–53` | KEEP (row) | Student-reported test; no screenshot required | Row 2 passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| B | 3 | **PASS** | Student reports: The last name appeared literally as `Scarf <i>limited</i>`; it was not interpreted as italic markup. | `b.js:31` | KEEP (row) | Student-reported test; no screenshot required | Row 3 passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| B | 4 | **PASS** | Student reports: Slow mode displayed `Loading products…` during the wait, then eight cards after approximately 3 seconds. | `b.js:44–48` | KEEP (row) | Student-reported test; no screenshot required | Row 4 passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| B | 5 | **PASS** | Student reports: Error mode displayed `Could not load products.` and Retry; switching to normal and pressing Retry restored eight cards. | `b.js:17, 39–48, 54–63` | KEEP (row) | Student-reported test; no screenshot required | Row 5 passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| B | 6 | **FAIL** | With `hang` selected, after approximately seven seconds the page still showed **`Loading products…`**; the `/api/products` request was Pending, with no error or Retry. | `public/versions/b.js:16` (`{ timeout: 5000 }` is ignored by `fetch`) | **FIX** | `evidence/b-row6.png` | Row 6 failed: in hang mode `Loading products…` remained after seven seconds with `/api/products` Pending; use a real five-second abort signal while preserving concurrent stock requests and Retry. |
+| B | 7 | **PASS** | Student reports: No uncaught application errors were reported in Console during rows 1–6. | `b.js:45–59` | KEEP (row) | Student-reported Console check; browser screenshot not supplied | Row 7 passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| B | 8 | **FAIL** | With `// @ts-check` on **line 1**, VS Code Problems reported **TS2353**: `timeout` does not exist in `RequestInit` (line 17 while the temporary comment was present). | `public/versions/b.js:16` in the original source (line 17 with temporary `// @ts-check`) | **FIX** | `evidence/b-row8.png` | Row 8 failed: VS Code reported TS2353 because `timeout` is not a `RequestInit` property; replace it with a supported signal and preserve parallel stock requests. |
+| B | empty | **PASS** | Student reports: Empty mode displayed `No products yet.`, zero cards and `0 đ`. | `b.js:42, 47–53` | KEEP (row) | Student-reported test; no screenshot required | Row empty passed the provided check; preserve this behavior when making any targeted fix to version B. |
+| C | 1 | **PASS** | Student reports: Under normal mode, eight product cards appeared in API order and the status line was empty. | `c.js:14–19, 28–38, 49–51` | KEEP (row) | Student-reported test; no screenshot required | Row 1 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 2 | **PASS** | Student reports: After the stock requests completed, the displayed stock value was `12.360.000 đ`. | `c.js:21–25, 53–57` | KEEP (row) | Student-reported test; no screenshot required | Row 2 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 3 | **PASS** | Student reports: The last name appeared literally as `Scarf <i>limited</i>`; it was not interpreted as italic markup. | `c.js:33` | KEEP (row) | Student-reported test; no screenshot required | Row 3 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 4 | **PASS** | Student reports: Slow mode displayed `Loading products…` during the wait, then eight cards after approximately 3 seconds. | `c.js:16, 47–51` | KEEP (row) | Student-reported test; no screenshot required | Row 4 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 5 | **PASS** | Student reports: Error mode displayed `Could not load products.` and Retry; switching to normal and pressing Retry restored eight cards. | `c.js:17, 43–51, 58–68` | KEEP (row) | Student-reported test; no screenshot required | Row 5 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 6 | **PASS** | Student reports: Hang mode replaced Loading with `Could not load products.` and Retry around the five-second timeout. | `c.js:16, 58–63` | KEEP (row) | Student-reported test; no screenshot required | Row 6 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 7 | **PASS** | Student reports: No uncaught application errors were reported in Console during rows 1–6. | `c.js:48–64` | KEEP (row) | Student-reported test; no screenshot required | Row 7 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | 8 | **PASS** | Student reports: With first-line `// @ts-check` in the full VS Code project, no TypeScript diagnostics were reported. | `c.js:4–10, 16` | KEEP (row) | Student-reported test; no screenshot required | Row 8 passed the provided check; preserve this behavior when making any targeted fix to version C. |
+| C | empty | **PASS** | Student reports: Empty mode displayed `No products yet.`, zero cards and `0 đ`. | `c.js:28–38, 51, 54–57` | KEEP (row) | Student-reported test; no screenshot required | Row empty passed the provided check; preserve this behavior when making any targeted fix to version C. |
 
-## 3. Final Verdicts — COMPLETE AFTER TESTING ORIGINALS
+### Additional brief constraint — concurrent stock requests
 
-| Version | Failed rows (observed) | Final verdict (`keep` / `fix` / `reject`) | Deciding row(s) and evidence | One-sentence instruction to assistant |
+| Version | Pre-fix result | Evidence / source | Note |
+|---|---|---|---|
+| A | **PASS** | `evidence/a-row2.png`; `a.js:52–55` | The screenshot shows eight completed stock calls starting in an overlapping waterfall; total calculation nevertheless fails row 2. |
+| B | **PASS — student-reported** | `b.js:50–53`; student's testing confirmation | No separate B Network screenshot was supplied to this update; verify again after the fix. |
+| C | **PASS — student-reported** | `c.js:53–57`; student's testing confirmation | No separate C Network screenshot was supplied; keep C untouched if subsequent checks agree. |
+
+**Screenshot provenance:** The three PNGs in `evidence/` are copies of the student's screenshots supplied during this conversation. `b-row6.png` visually shows a Pending products request and the loading state; the elapsed seven-second observation was reported by the student during testing. `b-row8.png` displays the first-line `// @ts-check` and TypeScript diagnostic. Return any temporary `// @ts-check` edit to the original source before committing documentation.
+
+## 3. Final Verdicts — for the ORIGINAL versions (before fixes)
+
+| Version | Failed rows | Verdict | Deciding evidence | One actionable sentence for the assistant |
 |---|---|---|---|---|
-| A | NOT RUN | PENDING | — | — |
-| B | NOT RUN | PENDING | — | — |
-| C | NOT RUN | PENDING | — | — |
+| **A** | 2 | **FIX** | `evidence/a-row2.png`, `public/versions/a.js:51–56` | Row 2 failed: all eight stock requests returned 200 but the stock value stayed `0 đ`; await their results as a group and retain parallel stock requests and all passing UI states. |
+| **B** | 6, 8 | **FIX** | `evidence/b-row6.png`, `evidence/b-row8.png`, `public/versions/b.js:16` | Rows 6 and 8 failed: `fetch` ignored `{ timeout: 5000 }` and `@ts-check` raised TS2353; use a supported five-second abort signal without changing concurrent stock aggregation, error states, or Retry. |
+| **C** | None reported | **KEEP** | Student reports all nine rows PASS; source `c.js:16, 33, 54–57` | All nine checks were reported to pass; keep version C unchanged and preserve the concurrent stock requests. |
 
-A `keep` decision means the original version passes every required test and stock requests are parallel. A `fix` decision requires an exact failing row and a targeted change; a `reject` decision still requires an acceptable replacement at the end. After each fix, rerun **all** rows and the parallel check. Commit each fixed version separately, changing only its corresponding file under `public/versions/`.
+These decisions are for the **original starter versions**. A and B still need to be fixed and tested again under every condition; the table is **not** a claim that the final source is already compliant.
 
-## 4. Prediction vs observation corrections — COMPLETE AFTER TESTING
+## 4. Prediction vs observation corrections
 
-Record any prediction contradicted by a real run; incorrect predictions are acceptable when clearly corrected with evidence.
+| Comparison | Observation |
+|---|---|
+| Predictions for A (row 2), B (rows 6 and 8), and every other row | All 27 initial predictions matched the student's reported outcomes. |
+| Assistant-independent code review | The provisional A = FIX, B = FIX, C = KEEP recommendations matched these original-version findings. |
+| Contradictory predictions / false positives | None reported from the standard nine-row test suite. |
 
-| Version | Row | Prediction | Actual observation | What I learned |
-|---|---|---|---|---|
-| — | — | — | NOT TESTED | — |
+## 5. Remaining verification for full marks
+
+- Keep the three screenshot files under `evidence/` in the submitted repository.
+- Verify the original prediction commit precedes these findings in Git history.
+- Restore any temporary `// @ts-check` source edits used for row 8 evidence.
+- After assistant-assisted fixes, rerun all 27 checks and the stock concurrency check. Commit **one version per fix** and keep the changes restricted to `public/versions/*.js`.

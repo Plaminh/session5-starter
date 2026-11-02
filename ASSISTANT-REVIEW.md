@@ -8,7 +8,7 @@
 - **Review date:** 2026-11-02.
 - **Review method:** Independent static code review.
 - **Runtime testing:** Not performed.
-- **Provenance:** Reviewer metadata and the exact original prompt were verified by the student. The full original assistant reply supplied as `Pasted text.txt` is preserved below without editing its claims. Browser and type-checker results remain unverified.
+- **Provenance:** Reviewer metadata and the exact original prompt were verified by the student. The full original assistant reply supplied as `Pasted text.txt` is preserved below without editing its claims. Later checks are documented separately in Section 4; the original reply remains a source-only review.
 
 ## 2. Original prompt
 
@@ -282,66 +282,69 @@ Row 8 therefore needs the requested `@ts-check` opt-in or an equivalent checker 
 - No claim is made that the workspace matches a historical starter commit; the review evaluates the supplied files as read.
 
 
-## 4. Claim verification against README.md
+## 4. Claim verification against README.md — original versions
 
-The table below indexes **all 27 row predictions** in the original review. Assistant predictions are not treated as observed results. Complete **Observed result**, **Confirmed/refuted**, and **Evidence** only after performing the corresponding test on the original version. For a failing row, record a screenshot in `evidence/<version>-row<N>.png` (for example `evidence/b-row6.png`).
+**Verification date:** 2026-11-02. All 27 original-version row results were confirmed by the student in the conversation. A row 2, B row 6 and B row 8 were also demonstrated with the student's screenshots. The original assistant's predictions above are retained **verbatim** and should not be confused with test observations. Other PASS checks are **student-reported**, not independently observed in the student's browser by the author of this update.
 
-| Version | Row | Assistant predicted | Browser/editor check to perform | Observed result | Confirmed / refuted | Evidence |
-|---|---|---|---|---|---|---|
-| A | 1 | PASS | normal: 8 cards, API order, blank status | NOT RUN | PENDING | — |
-| A | 2 | FAIL | normal: stock total 12.360.000 đ | NOT RUN | PENDING | — |
-| A | 3 | PASS | normal: literal Scarf <i>limited</i> text | NOT RUN | PENDING | — |
-| A | 4 | PASS | slow: loading for ~3 s, then cards | NOT RUN | PENDING | — |
-| A | 5 | PASS | error: message + Retry; normal then Retry succeeds | NOT RUN | PENDING | — |
-| A | 6 | PASS | hang: error + Retry at ~5 s (not ~30 s) | NOT RUN | PENDING | — |
-| A | 7 | PASS | Console during rows 1–6: no uncaught errors | NOT RUN | PENDING | — |
-| A | 8 | PASS | folder open; // @ts-check first line; no diagnostics | NOT RUN | PENDING | — |
-| A | empty | PASS | empty: No products yet. and 0 đ | NOT RUN | PENDING | — |
-| B | 1 | PASS | normal: 8 cards, API order, blank status | NOT RUN | PENDING | — |
-| B | 2 | PASS | normal: stock total 12.360.000 đ | NOT RUN | PENDING | — |
-| B | 3 | PASS | normal: literal Scarf <i>limited</i> text | NOT RUN | PENDING | — |
-| B | 4 | PASS | slow: loading for ~3 s, then cards | NOT RUN | PENDING | — |
-| B | 5 | PASS | error: message + Retry; normal then Retry succeeds | NOT RUN | PENDING | — |
-| B | 6 | FAIL | hang: error + Retry at ~5 s (not ~30 s) | NOT RUN | PENDING | — |
-| B | 7 | PASS | Console during rows 1–6: no uncaught errors | NOT RUN | PENDING | — |
-| B | 8 | FAIL | folder open; // @ts-check first line; no diagnostics | NOT RUN | PENDING | — |
-| B | empty | PASS | empty: No products yet. and 0 đ | NOT RUN | PENDING | — |
-| C | 1 | PASS | normal: 8 cards, API order, blank status | NOT RUN | PENDING | — |
-| C | 2 | PASS | normal: stock total 12.360.000 đ | NOT RUN | PENDING | — |
-| C | 3 | PASS | normal: literal Scarf <i>limited</i> text | NOT RUN | PENDING | — |
-| C | 4 | PASS | slow: loading for ~3 s, then cards | NOT RUN | PENDING | — |
-| C | 5 | PASS | error: message + Retry; normal then Retry succeeds | NOT RUN | PENDING | — |
-| C | 6 | PASS | hang: error + Retry at ~5 s (not ~30 s) | NOT RUN | PENDING | — |
-| C | 7 | PASS | Console during rows 1–6: no uncaught errors | NOT RUN | PENDING | — |
-| C | 8 | PASS | folder open; // @ts-check first line; no diagnostics | NOT RUN | PENDING | — |
-| C | empty | PASS | empty: No products yet. and 0 đ | NOT RUN | PENDING | — |
+| Version | Row | Assistant prediction | Actual result reported by student | Comparison | Evidence / note |
+|---|---|---|---|---|---|
+| A | 1 | PASS | PASS — student reports: Under normal mode, eight product cards appeared in API order and the status line was empty. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row (also visible in `evidence/a-row2.png`) |
+| A | 2 | FAIL | Eight `/api/stock/…` requests finished with HTTP 200, but the page still displayed **`Stock value: 0 đ`** instead of `12.360.000 đ`; Network showed overlapping request starts. | **CONFIRMED** | `evidence/a-row2.png` |
+| A | 3 | PASS | PASS — student reports: The last name appeared literally as `Scarf <i>limited</i>`; it was not interpreted as italic markup. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row (also visible in `evidence/a-row2.png`) |
+| A | 4 | PASS | PASS — student reports: Slow mode displayed `Loading products…` during the wait, then eight cards after approximately 3 seconds. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| A | 5 | PASS | PASS — student reports: Error mode displayed `Could not load products.` and Retry; switching to normal and pressing Retry restored eight cards. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| A | 6 | PASS | PASS — student reports: Hang mode replaced Loading with `Could not load products.` and Retry around the five-second timeout. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| A | 7 | PASS | PASS — student reports: No uncaught application errors were reported in Console during rows 1–6. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| A | 8 | PASS | PASS — student reports: With first-line `// @ts-check` in the full VS Code project, no TypeScript diagnostics were reported. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| A | empty | PASS | PASS — student reports: Empty mode displayed `No products yet.`, zero cards and `0 đ`. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 1 | PASS | PASS — student reports: Under normal mode, eight product cards appeared in API order and the status line was empty. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 2 | PASS | PASS — student reports: After the stock requests completed, the displayed stock value was `12.360.000 đ`. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 3 | PASS | PASS — student reports: The last name appeared literally as `Scarf <i>limited</i>`; it was not interpreted as italic markup. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 4 | PASS | PASS — student reports: Slow mode displayed `Loading products…` during the wait, then eight cards after approximately 3 seconds. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 5 | PASS | PASS — student reports: Error mode displayed `Could not load products.` and Retry; switching to normal and pressing Retry restored eight cards. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 6 | FAIL | With `hang` selected, after approximately seven seconds the page still showed **`Loading products…`**; the `/api/products` request was Pending, with no error or Retry. | **CONFIRMED** | `evidence/b-row6.png` |
+| B | 7 | PASS | PASS — student reports: No uncaught application errors were reported in Console during rows 1–6. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| B | 8 | FAIL | With `// @ts-check` on **line 1**, VS Code Problems reported **TS2353**: `timeout` does not exist in `RequestInit` (line 17 while the temporary comment was present). | **CONFIRMED** | `evidence/b-row8.png` |
+| B | empty | PASS | PASS — student reports: Empty mode displayed `No products yet.`, zero cards and `0 đ`. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 1 | PASS | PASS — student reports: Under normal mode, eight product cards appeared in API order and the status line was empty. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 2 | PASS | PASS — student reports: After the stock requests completed, the displayed stock value was `12.360.000 đ`. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 3 | PASS | PASS — student reports: The last name appeared literally as `Scarf <i>limited</i>`; it was not interpreted as italic markup. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 4 | PASS | PASS — student reports: Slow mode displayed `Loading products…` during the wait, then eight cards after approximately 3 seconds. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 5 | PASS | PASS — student reports: Error mode displayed `Could not load products.` and Retry; switching to normal and pressing Retry restored eight cards. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 6 | PASS | PASS — student reports: Hang mode replaced Loading with `Could not load products.` and Retry around the five-second timeout. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 7 | PASS | PASS — student reports: No uncaught application errors were reported in Console during rows 1–6. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | 8 | PASS | PASS — student reports: With first-line `// @ts-check` in the full VS Code project, no TypeScript diagnostics were reported. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
+| C | empty | PASS | PASS — student reports: Empty mode displayed `No products yet.`, zero cards and `0 đ`. | **CONFIRMED** | Student confirmation; screenshot not required for a PASS row |
 
-**Evidence rule:** For every actual FAIL, include the exact visible behaviour, the relevant original source line(s), and the corresponding screenshot. For PASS, write the observation actually made (not only “PASS”). Do not call a prediction confirmed solely from source reading.
+### Consistency checks
 
-## 5. Other substantive claims to verify
+- **27/27 predictions agreed with the student's reported outcomes**: A row 2 FAIL; B rows 6 and 8 FAIL; all other rows PASS.
+- **Failures missed by the independent assistant:** None reported in the standard nine-row tests.
+- **False-positive failures claimed by the independent assistant:** None identified.
+- The original review was **static only**; the claims above were checked later. Keeping the original unchanged is important to show what the assistant actually said before testing.
 
-| Claim made by the assistant | Verification method / relevant requirement | Verification status | Evidence |
+## 5. Additional claims and constraints
+
+| Review claim | Verification | Status | Evidence / limitation |
 |---|---|---|---|
-| A: stock calls start in parallel but total is rendered before promises resolve (`a.js:52–56`) | Network starts for `/api/stock/…` + displayed total, row 2 and brief item 5 | PENDING | — |
-| A: an individual stock request rejection may escape the outer catch (`a.js:52–55`) | Static finding; **not** proof of a row 7 failure under standard successful stock fixtures. Do not modify `server.mjs` to force a failure. | STATIC CLAIM ONLY / NOT TESTED | `a.js:52–55` as cited by the assistant |
-| B: `fetch` ignores `{ timeout: 5000 }` (`b.js:16`) | Hang test, row 6: check status at 5–7 s and actual time to error | PENDING | — |
-| B: the unsupported `timeout` property causes a JS type diagnostic (`b.js:16`) | Open full starter folder; `// @ts-check` at first line of B or equivalent supported check; row 8 | PENDING | — |
-| B: stock-only failure might leave already rendered cards visible | Outside the supplied standard product-error fixture; note scope, do not invent a failed rubric row | OUTSIDE STANDARD RUBRIC CHECK | Assistant response, Version B secondary observation |
-| B and C: stock requests are concurrent and totals are awaited (`b.js:51–53`, `c.js:54–57`) | Network waterfall: compare request start times, not their finish order; brief item 5 | PENDING | — |
-| C: no defect identified and can be kept unchanged | Execute all nine rows and the parallel check for C before declaring KEEP | PENDING | — |
+| A's stock requests begin concurrently but total is displayed before awaiting them | Eight stock HTTP 200 responses; page still shows `0 đ`; overlapping Network waterfall | **CONFIRMED** | `evidence/a-row2.png`, `a.js:51–56` |
+| A's detached stock callback could reject outside outer `try/catch` | Static reasoning; no failing stock request in standard fixtures | **STATIC RISK — NOT EXERCISED** | `a.js:52–55`; do not call standard row 7 a FAIL on this basis |
+| B's unsupported `{ timeout: 5000 }` fails to abort `hang` | Loading remains while products request is Pending after student's reported 7-second interval | **CONFIRMED** | `evidence/b-row6.png`, `b.js:16` |
+| B's `timeout` property fails type checking | VS Code diagnostic **TS2353**, `timeout` not in `RequestInit`, with first-line `// @ts-check` | **CONFIRMED** | `evidence/b-row8.png`, original `b.js:16` |
+| B and C await stock requests concurrently | Student reports both passed the stock total and concurrency checks; matches `Promise.all` in source | **STUDENT-REPORTED PASS** | `b.js:50–53`, `c.js:53–57`; separate B/C Network screenshots not supplied |
+| Version C needs no original-code fix | Student reports every original C test PASS, including `empty` and type checking | **CONFIRMED BY STUDENT REPORT** | C results in `VERDICTS.md`; no C failure screenshot |
+| B may leave cards rendered after a stock-only rejection | Not part of the supplied standard HTTP product-error mode | **OUTSIDE TEST SCOPE** | Not counted as a row 5 failure |
 
-## 6. Findings the assistant missed or incorrectly claimed
+## 6. What the assistant got wrong or missed
 
-- **Confirmed incorrect claims / false positives:** PENDING — compare all 27 assistant predictions with actual recorded tests.
-- **Failures found by manual testing but missed by the assistant:** PENDING — list each `(version, row)`, observed behaviour, source line and evidence screenshot.
-- **Static risks that do not produce a failure in the provided fixtures:** The assistant explicitly separated A’s stock-rejection risk and B’s stock-only-error observation from the normal rubric rows. These are **not** counted as FAIL without a matching test result.
+No incorrect PASS/FAIL prediction was identified in the standard nine-row checks, according to the student's testing. The model's identified failures — A row 2, B rows 6 and 8 — matched the submitted screenshots. The secondary stock-only failure observations were not treated as confirmed rubric failures. Do not invent a rejected claim simply to populate `AI-LOG.md`.
 
-## 7. Final evaluation (complete after testing)
+## 7. Final student verdicts — BEFORE repairs
 
-| Version | Assistant provisional recommendation | Final student verdict | Rows supporting it | Evidence |
+| Version | Assistant's provisional verdict | Student verdict | Deciding rows | Evidence |
 |---|---|---|---|---|
-| A | FIX | PENDING | PENDING | PENDING |
-| B | FIX | PENDING | PENDING | PENDING |
-| C | KEEP | PENDING | PENDING | PENDING |
+| A | FIX | **FIX** | 2 | `evidence/a-row2.png` |
+| B | FIX | **FIX** | 6, 8 | `evidence/b-row6.png`, `evidence/b-row8.png` |
+| C | KEEP | **KEEP** | All nine PASS (student-reported) | `VERDICTS.md`, original C source |
 
-**Review limitation:** This document preserves the original AI response but is **not yet a fully checked assistant review**. The prompt provenance is recorded above; test-based verification must be completed before claiming full rubric marks.
+**Next step:** The original-version review is checked; however, A and B have not yet been repaired in these documents. After each fix, rerun every row and the concurrency check and document regressions, if any. This review does not establish post-fix compliance.
