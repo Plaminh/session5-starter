@@ -140,3 +140,49 @@ These decisions are for the **original starter versions**. A and B still need to
 - Verify the original prediction commit precedes these findings in Git history.
 - Restore any temporary `// @ts-check` source edits used for row 8 evidence.
 - After assistant-assisted fixes, rerun all 27 checks and the stock concurrency check. Commit **one version per fix** and keep the changes restricted to `public/versions/*.js`.
+
+## Phase 4 — Post-Fix Verification
+
+**Documentation date:** 2026-11-02. **Scope:** Updated Version A only. All original predictions, test results, failure evidence, and A/B/C verdicts above remain unchanged.
+
+**Original Version A:** **FIX** — README row 2 failed: the stock total remained `0 đ` despite eight successful concurrent stock requests. Original evidence remains `evidence/a-row2.png`; it is not post-fix evidence.
+
+**Targeted correction:** Existing commit `7028acc` (`fix(a): await concurrent stock requests`) changes only `public/versions/a.js`. Current lines 51–53 use `await Promise.all(products.map((p) => getStock(p.id)))`, then reduce `price * stocks[i]` from zero and write the total through the existing `formatVnd` function. All stock requests start concurrently; calculation waits for their responses. Empty arrays retain `0 đ`, and stock failures enter the existing catch. Expected corrected normal total: **`12.360.000 đ`**.
+
+**Updated Version A:** **PASS / VERIFIED — all 10 checks passed in Codex-executed post-fix testing on 2026-11-02.** Ready to finalize Version A. The historical original-version verdict remains **FIX (row 2)**. Version B still requires its targeted fixes; Phase 4 as a whole is not complete.
+
+### Version A regression checklist
+
+**Testing method and date:** On 2026-11-02, Codex automated installed Microsoft Edge `156.0.4314.58` in headless mode through the Chrome DevTools Protocol at `http://localhost:5050/?v=a`, with cache and extensions disabled. The existing server on port 5050 was reused after confirming its served A source exactly matched the workspace. Tests clicked the actual mode buttons, reloaded the page, and clicked Retry. DOM observations, browser network events, Resource Timing, and mutation timestamps supplied the observations below; no fetch/DOM mocks were used. Check 8 used VS Code's installed TypeScript `6.0.3` API with the existing `jsconfig.json` options plus `allowJs: true`, `checkJs: true`, and `noEmit: true`, restricted to A. No source comment or configuration was changed, and nothing was downloaded.
+
+These are **Codex-executed results**, not student manual results. No additional student manual tests have been reported. All 10 checks completed; none remain pending. Evidence is the recorded browser/checker execution and measurements below; there was no confirmed application failure requiring a screenshot.
+
+| Check | Actual observed behaviour | Result | Tool / evidence |
+|---|---|---|---|
+| 1. Normal cards | Exactly eight cards; IDs and names matched the actual products API in order: tshirt, hoodie, somi, cap, tote, socks, jacket, scarf. Prices were `180.000 đ`, `420.000 đ`, `350.000 đ`, `95.000 đ`, `120.000 đ`, `75.000 đ`, `890.000 đ`, `160.000 đ`. Final status was empty. | PASS | Edge DOM compared with the live API response |
+| 2. Stock total | All eight stock requests returned HTTP 200. The displayed total changed from the placeholder to exactly `12.360.000 đ`; it did not remain at `0 đ`. | PASS | Edge DOM, network events, and mutation timestamps |
+| 3. Literal scarf text | Last name was exactly `Scarf <i>limited</i>`; zero `i`/`em` descendants were created. Its DOM innerHTML was `Scarf &lt;i&gt;limited&lt;/i&gt;`. | PASS | Edge DOM text, markup, and descendant checks |
+| 4. Slow loading | `Loading products…` appeared with zero cards; eight cards then appeared and status cleared. Products response arrived after **3008.219 ms**; the loading-to-cards interval was **3012.300 ms**. The total subsequently became `12.360.000 đ`. | PASS | CDP network timestamps and DOM mutation timestamps |
+| 5. Error and Retry | Real HTTP 500 produced `Could not load products.`, visible Retry, and zero cards. Selecting normal and clicking Retry restored eight cards and `12.360.000 đ`; status cleared and Retry became hidden. | PASS | Edge mode-button/Retry clicks, DOM, and network events |
+| 6. Five-second timeout | The pending products request was canceled after **5000.751 ms**, with `net::ERR_ABORTED` and `canceled: true`; the error message and Retry appeared with zero cards, without waiting thirty seconds. | PASS | CDP request/loadingFailed timestamps and DOM |
+| 7. Console errors | Final extensions-disabled run recorded **0** runtime exceptions/unhandled rejections and **0** application console.error calls across the browser cases. Browser network diagnostics were the expected products HTTP 500 and missing `favicon.ico` HTTP 404; neither was an application exception. | PASS | CDP Runtime.exceptionThrown, Runtime.consoleAPICalled, and Log.entryAdded |
+| 8. Type checking | Existing VS Code TypeScript **6.0.3** checker returned **0 diagnostics** for updated A with JavaScript checking enabled and the project compiler options. Source remained unchanged. | PASS | TypeScript API, checkJs/noEmit equivalent to the README opt-in; no download |
+| 9. Empty response | Zero cards, exactly `No products yet.`, and `0 đ`; Retry hidden and no stock requests issued. | PASS | Edge DOM and network events |
+| 10. Parallel stock requests | All eight stock requests started within **1.8 ms**; the first response began **226.6 ms** after the first start. All request lifetimes overlapped before any response. Last completion was **816.8 ms** after the first start; `12.360.000 đ` was displayed **2.2 ms** later. | PASS | Browser Resource Timing and DOM mutation timestamps; detailed timings below |
+
+**Concurrent-request measurements:** Milliseconds relative to the first stock request start in the final normal-mode run. These are browser resource start times, including any browser connection scheduling, not a claim that eight sockets transmitted at the same instant.
+
+| Stock ID | Request start (ms) | Response start (ms) | Response complete (ms) |
+|---|---|---|---|
+| tshirt | 0.0 | 545.0 | 546.3 |
+| hoodie | 0.1 | 546.5 | 547.5 |
+| somi | 0.5 | 528.0 | 529.8 |
+| cap | 0.7 | 326.2 | 327.0 |
+| tote | 0.9 | 526.5 | 527.8 |
+| socks | 1.1 | 226.6 | 228.1 |
+| jacket | 1.4 | 814.3 | 816.8 |
+| scarf | 1.8 | 544.5 | 545.4 |
+
+**Earlier validation and test limitations:** The implementation-time syntax and mocked Node checks remain historical preliminary checks; they are not the basis for the browser PASS results above. The initial browser script sometimes sampled the old page before reload completed; its synchronization was corrected. A subsequent run exposed `getAllPromptList` promise errors from `chrome-extension://difoiogjjojoaoomphldepapgpbgkhkb/content-all.js`, not application source. The final run repeated all browser cases with extensions disabled and recorded zero runtime exceptions. Diagnostic screenshots from the invalid pilot runs were discarded, not used as failure evidence. Original Phase 3 screenshots were untouched. A first checker invocation had a configuration-path discovery error; normalizing the Windows path produced the completed zero-diagnostic check. These tooling issues were not counted as application regressions.
+
+**Regressions and final scope:** No application regression was found in the ten executed checks. The unrelated favicon 404 remains visible as a browser network diagnostic. No student manual testing is claimed. Validation covers this installed Edge/TypeScript environment, not every browser. The temporary browser was closed and the existing server was left running in normal mode. Version A is ready to finalize; Version B remains unfixed, so Phase 4 is not complete.
