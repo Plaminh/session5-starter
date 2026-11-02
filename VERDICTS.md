@@ -186,3 +186,43 @@ These are **Codex-executed results**, not student manual results. No additional 
 **Earlier validation and test limitations:** The implementation-time syntax and mocked Node checks remain historical preliminary checks; they are not the basis for the browser PASS results above. The initial browser script sometimes sampled the old page before reload completed; its synchronization was corrected. A subsequent run exposed `getAllPromptList` promise errors from `chrome-extension://difoiogjjojoaoomphldepapgpbgkhkb/content-all.js`, not application source. The final run repeated all browser cases with extensions disabled and recorded zero runtime exceptions. Diagnostic screenshots from the invalid pilot runs were discarded, not used as failure evidence. Original Phase 3 screenshots were untouched. A first checker invocation had a configuration-path discovery error; normalizing the Windows path produced the completed zero-diagnostic check. These tooling issues were not counted as application regressions.
 
 **Regressions and final scope:** No application regression was found in the ten executed checks. The unrelated favicon 404 remains visible as a browser network diagnostic. No student manual testing is claimed. Validation covers this installed Edge/TypeScript environment, not every browser. The temporary browser was closed and the existing server was left running in normal mode. Version A is ready to finalize; Version B remains unfixed, so Phase 4 is not complete.
+
+### Version B — Post-Fix Verification
+
+**Testing date:** 2026-11-02. This subsection records the subsequent Version B fix and verification. Earlier references to B still needing repair describe the state when Version A was verified; this subsection supersedes that pending status without changing A's results or any original-version findings.
+
+**Original Version B:** **FIX — rows 6 and 8 failed.** Original `public/versions/b.js:16` passed unsupported `{ timeout: 5000 }` to fetch. In hang mode, loading and the pending products request persisted beyond seven seconds (`evidence/b-row6.png`). With first-line `// @ts-check`, VS Code reported TS2353 because `timeout` is not a RequestInit property (`evidence/b-row8.png`; line 17 while the temporary comment was present). These original results and screenshots remain unchanged.
+
+**Implemented correction:** Updated `public/versions/b.js:16` replaces only `{ timeout: 5000 }` with `{ signal: AbortSignal.timeout(5000) }`. The valid RequestInit signal aborts the products request after five seconds and routes its rejection through the existing catch at lines 54–56. The concurrent `Promise.all(products.map(...))` and indexed stock reduction at lines 51–53 are untouched, as are rendering, currency formatting, textContent, Retry, and empty-state handling. No fallback, dependency, other implementation edit, or commit was introduced.
+
+**Environment and method:** Codex reused the running original server at `http://localhost:5050/?v=b` after confirming HTTP 200 and byte-for-byte equality between the served B source and the workspace. Installed Microsoft Edge **156.0.4314.58** ran headlessly through Chrome DevTools Protocol **1.3**, with cache and extensions disabled. Tests clicked the actual mode buttons, reloaded, and clicked Retry, using real endpoints and no mocked responses. DOM, network events, Resource Timing, and mutation timestamps supplied browser observations. VS Code's installed TypeScript **6.0.3** API checked B alone with `jsconfig.json` options plus `allowJs: true`, `checkJs: true`, and `noEmit: true`; no source comment or configuration change was needed. Node **v24.11.1** syntax checking and `git diff --check` also passed. No tool or dependency was installed.
+
+| Check | Result | Actual observed behaviour | Method / evidence |
+|---|---|---|---|
+| 1. Normal cards | PASS | Exactly eight cards matched live API IDs, names, and order: tshirt, hoodie, somi, cap, tote, socks, jacket, scarf. Prices were `180.000 đ`, `420.000 đ`, `350.000 đ`, `95.000 đ`, `120.000 đ`, `75.000 đ`, `890.000 đ`, `160.000 đ`. Final status was empty. | Edge DOM compared with actual products API response |
+| 2. Stock total | PASS | All eight stock requests returned HTTP 200; the final output was exactly `12.360.000 đ`. | Edge DOM, network events, and mutation timestamps |
+| 3. Safe text rendering | PASS | Last name was exactly `Scarf <i>limited</i>`; zero i/em descendants existed, and innerHTML contained `Scarf &lt;i&gt;limited&lt;/i&gt;`. | Edge text/markup/descendant checks |
+| 4. Slow loading | PASS | `Loading products…` appeared with zero cards. Products response arrived after **3016.536 ms**; eight cards appeared and status cleared after a **3017.400 ms** loading interval. The correct total followed. | CDP network and DOM mutation timestamps |
+| 5. HTTP error and Retry | PASS | HTTP 500 displayed `Could not load products.`, visible Retry, and zero cards. Selecting normal and clicking Retry restored eight cards and `12.360.000 đ`; status cleared and Retry hid. | Real mode-button/Retry clicks, network status, and DOM |
+| 6. Five-second timeout | PASS | The pending products request was canceled after **5005.099 ms**, with `net::ERR_ABORTED` and `canceled: true`. Loading changed to `Could not load products.`, Retry appeared, and zero cards remained; no thirty-second wait. | CDP request/loadingFailed timestamps and DOM |
+| 7. Console | PASS | **0** uncaught runtime exceptions/unhandled rejections and **0** application console.error calls across browser scenarios. Browser-generated products HTTP 500 and missing favicon HTTP 404 diagnostics were recorded separately. | CDP Runtime.exceptionThrown, Runtime.consoleAPICalled, and Log.entryAdded |
+| 8. Type checking | PASS | TypeScript **6.0.3** returned **0 diagnostics** for updated B with JavaScript checking enabled and project options. The former invalid timeout property is absent. | Existing VS Code TypeScript API; checkJs/noEmit equivalent to README opt-in |
+| 9. Empty response | PASS | Zero cards, exactly `No products yet.`, and `0 đ`; Retry hidden and no stock requests. | Edge DOM and network events |
+| 10. Parallel stock requests | PASS | All eight resource starts fell within **0.4 ms**, before the first response at **150.8 ms**. The last response completed at **719.7 ms**, and `12.360.000 đ` appeared **2.2 ms** later. Requests overlapped; concurrency was measured independently of the correct total. | Browser Resource Timing and DOM mutation timestamps |
+
+**Stock timing evidence:** Milliseconds relative to the first stock request start in the final normal-mode run. Resource start times include browser connection scheduling; these measurements do not assert eight simultaneous socket transmissions.
+
+| Stock ID | Request start (ms) | Response start (ms) | Response complete (ms) |
+|---|---|---|---|
+| tshirt | 0.0 | 150.8 | 151.1 |
+| hoodie | 0.2 | 433.8 | 434.1 |
+| somi | 0.2 | 451.3 | 451.6 |
+| cap | 0.2 | 518.6 | 519.0 |
+| tote | 0.3 | 585.3 | 585.7 |
+| socks | 0.3 | 552.2 | 553.3 |
+| jacket | 0.4 | 585.7 | 585.9 |
+| scarf | 0.4 | 719.1 | 719.7 |
+
+**Regressions, evidence, and limitations:** No application regression or new confirmed failure was found; no new failure screenshot was required or created. Original evidence and Version A's entire post-fix record remain unchanged. The favicon 404 is a browser network diagnostic, not a B application exception. These were Codex-executed tests; no new student manual results are claimed. All ten checks completed with no pending checks. Results cover this installed browser/checker environment. The temporary browser was closed and the existing server left running in normal mode.
+
+**Updated Version B: PASS / VERIFIED — all 10 post-fix checks passed.** B is ready for the student's separate code-fix and documentation commits. The original B verdict remains **FIX (rows 6 and 8)**. Together with A's existing verification and C's unchanged original KEEP result, the targeted fixes and required post-fix checks for Phase 4 are complete in the recorded environment. No Phase 5 work was started.
